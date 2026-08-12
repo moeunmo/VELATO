@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VELATO</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Bebas+Neue&family=Song+Myung&family=Nanum+Myeongjo:wght@400;700;800&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+@font-face {
+  font-family: 'BrokenDetroit';
+  src: url('brokendetroit.ttf') format('truetype');
+  font-display: swap;
+}
+
+  /* ============================================
+     여기서 데이터만 바꾸면 조직/캐릭터가 자동으로 반영됩니다.
+     아래 <script> 안의 ORGANIZATIONS, CHARACTERS 배열을 편집하세요.
+     ============================================ */
+
+  :root{
+    --bg: #0a0a0a;
+    --bg-vignette: radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.05), transparent 55%),
+                   radial-gradient(ellipse at 50% 100%, rgba(0,0,0,0.6), transparent 60%);
+    --paper-noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+    --card: #151515;
+    --card-edge: #3a3a3a;
+    --gold: #f2f2ee;
+    --gold-bright: #ffffff;
+    --wine: #2a2a2a;
+    --wine-bright: #444444;
+    --cream: #e8e8e2;
+    --text: #e8e8e2;
+    --text-muted: #8f8f89;
+    --radius: 4px;
+    --font-title: 'Cinzel', serif;
+    --font-brand: 'BrokenDetroit', 'Playfair Display', serif;
+    --font-poem: 'Song Myung', serif;
+    --font-name: 'HsBombaram30', 'Nanum Myeongjo', serif;
+    --font-body: 'Pretendard', system-ui, sans-serif;
+    --font-mono: 'Courier Prime', monospace;
+  }
+
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0;
+    background: var(--bg-vignette), var(--paper-noise), var(--bg);
+    background-attachment:fixed;
+    color:var(--text);
+    font-family: var(--font-body);
+    min-height:100vh;
+  }
+
+  /* ---------- Header ---------- */
+  header{
+    padding:80px 24px 40px;
+    text-align:center;
+    max-width:760px;
+    margin:0 auto;
+    position:relative;
+  }
+ .brand-title{
+    font-family:var(--font-brand);
+    font-weight:400;
+    font-style:normal;
+    font-size:clamp(60px, 12vw, 110px);
+    letter-spacing:0.03em;
+    margin:0 0 28px;
+    color:var(--gold-bright);
+  }
+  .brand-poem{
+    font-family:var(--font-poem);
+    font-size:15.5px;
+    line-height:2.15;
+    letter-spacing:0.03em;
+    color:var(--cream);
+    opacity:0.82;
+    margin:0;
+  }
+
+  .seal-divider{
+    width:38px; height:38px;
+    margin:32px auto 0;
+    border:2px solid var(--gold);
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    color:var(--gold);
+    font-family:var(--font-title);
+    font-size:14px;
+    opacity:0.85;
+  }
+
+  /* ---------- Organization sections ---------- */
+  .org-section{
+    max-width:1100px;
+    margin:0 auto 92px;
+    padding:0 24px;
+  }
+  .org-header{
+    display:flex;
+    align-items:baseline;
+    flex-wrap:wrap;
+    gap:6px 16px;
+    margin-bottom:30px;
+    padding-bottom:16px;
+    border-bottom:1px solid var(--card-edge);
+  }
+  .org-header h2{
+    font-family:var(--font-title);
+    font-weight:700;
+    font-size:24px;
+    letter-spacing:0.1em;
+    margin:0;
+    color:var(--gold-bright);
+  }
+  .org-header h2 a{
+    color:inherit;
+    text-decoration:none;
+    border-bottom:1px dashed var(--gold);
+    transition:color 0.15s ease;
+  }
+  .org-header h2 a:hover{ color:var(--gold); }
+  .org-role{
+    font-family:var(--font-mono);
+    font-size:12px;
+    color:var(--text-muted);
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    margin:0;
+  }
+.org-count{
+    display:none;
+  }
+
+  /* ---------- Gallery grid ---------- */
+  .gallery{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(180px, 1fr));
+    gap:22px;
+  }
+
+  .card{
+    position:relative;
+    background:var(--card);
+    border:1px solid var(--card-edge);
+    border-radius:var(--radius);
+    padding:0;
+    overflow:hidden;
+    cursor:pointer;
+    text-align:left;
+    color:inherit;
+    font-family:inherit;
+    transition:transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    box-shadow:0 10px 24px rgba(0,0,0,0.5);
+  }
+  .card:hover, .card:focus-visible{
+    transform:translateY(-6px);
+    box-shadow:0 20px 36px rgba(0,0,0,0.6);
+    border-color:var(--gold);
+  }
+  .card:focus-visible{ outline:2px solid var(--gold); outline-offset:3px; }
+
+  .card-art{
+    height:220px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:var(--font-title);
+    font-size:46px;
+    font-weight:700;
+    color:rgba(255,255,255,0.3);
+    background-size:cover;
+    background-position:center 30%;
+  }
+
+  .card-name-bar{
+    padding:14px 12px;
+    text-align:center;
+    border-top:1px solid var(--card-edge);
+  }
+  .card-name{
+    font-family:var(--font-name);
+    font-size:19px;
+    font-weight:700;
+    margin:0;
+    color:var(--gold-bright);
+    letter-spacing:0.01em;
+  }
+  .card-name-orig{
+    font-family:var(--font-mono);
+    font-size:10.5px;
+    font-weight:400;
+    margin:4px 0 0;
+    color:var(--text-muted);
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+  }
+
+  /* placeholder (미등록 자리) */
+  .card.placeholder{
+    cursor:default;
+    border:1px dashed var(--card-edge);
+    background:transparent;
+    box-shadow:none;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    min-height:270px;
+    color:var(--text-muted);
+    gap:8px;
+  }
+  .card.placeholder:hover{ transform:none; box-shadow:none; border-color:var(--gold); }
+  .card.placeholder .plus{
+    font-family:var(--font-title);
+    font-size:26px;
+    color:var(--gold);
+    opacity:0.7;
+  }
+  .card.placeholder .slot-label{
+    font-family:var(--font-mono);
+    font-size:11.5px;
+    letter-spacing:0.05em;
+  }
+
+  /* ---------- Modal (사진 크게 보기) ---------- */
+  .overlay{
+    position:fixed; inset:0;
+    background:rgba(6,4,3,0.86);
+    backdrop-filter:blur(4px);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    z-index:50;
+  }
+  .overlay.open{ display:flex; }
+
+  .modal{
+    background:var(--card);
+    border:1px solid var(--gold);
+    border-radius:6px;
+    max-width:600px;
+    width:100%;
+    max-height:90vh;
+    overflow:hidden;
+    position:relative;
+    box-shadow:0 30px 80px rgba(0,0,0,0.7);
+    display:flex;
+    flex-direction:column;
+  }
+  .modal-art{
+    width:100%;
+    max-height:72vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:var(--bg);
+    position:relative;
+  }
+  .modal-art img{
+    display:block;
+    max-width:100%;
+    max-height:72vh;
+    object-fit:contain;
+  }
+  .modal-art .modal-initial{
+    font-family:var(--font-title);
+    font-size:88px;
+    font-weight:700;
+    color:rgba(255,255,255,0.35);
+    width:100%;
+    height:320px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .modal-close{
+    position:absolute;
+    top:14px; right:14px;
+    width:34px; height:34px;
+    border-radius:50%;
+    border:1px solid var(--gold);
+    background:rgba(0,0,0,0.5);
+    color:var(--gold-bright);
+    font-size:16px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:3;
+  }
+  .modal-close:hover{ background:var(--wine); }
+  .modal-name-bar{
+    padding:20px 24px;
+    text-align:center;
+    border-top:1px solid var(--card-edge);
+  }
+  .modal-name-bar h2{
+    font-family:var(--font-name);
+    font-weight:700;
+    margin:0;
+    font-size:26px;
+    color:var(--gold-bright);
+  }
+  .modal-name-orig{
+    font-family:var(--font-mono);
+    font-size:12px;
+    font-weight:400;
+    margin:6px 0 0;
+    color:var(--text-muted);
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ transition:none !important; scroll-behavior:auto !important; }
+  }
+
+  footer{
+    text-align:center;
+    color:var(--text-muted);
+    font-family:var(--font-mono);
+    font-size:11px;
+    letter-spacing:0.05em;
+    padding:24px;
+    opacity:0.6;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1 class="brand-title">VELATO</h1>
+  <p class="brand-poem">전통은권력을지키고<br>야망은질서를뒤엎으며<br>돈은중립을선택하고<br>법은그모든것을쫓는다.</p>
+  <div class="seal-divider">✠</div>
+</header>
+
+<div id="orgContainer"></div>
+
+<div class="overlay" id="overlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalName">
+    <button class="modal-close" id="modalClose" aria-label="닫기">✕</button>
+    <div class="modal-art" id="modalArt">
+      <img id="modalImg" alt="" style="display:none;">
+      <span class="modal-initial" id="modalInitial" style="display:none;"></span>
+    </div>
+    <div class="modal-name-bar">
+      <h2 id="modalName"></h2>
+      <p class="modal-name-orig" id="modalNameOrig"></p>
+    </div>
+  </div>
+</div>
+
+<footer>VELATO ARCHIVE · 모든 캐릭터와 설정의 권리는 각 제작자에게 있습니다.</footer>
+
+<script>
+/* ============================================================
+   ⭐ 조직 정보 — 여기서 조직 이름/역할/링크/인원수를 관리합니다.
+   ------------------------------------------------------------
+   id    : 고유값 (영문, CHARACTERS의 org 값과 일치해야 함)
+   name  : 조직 이름
+   role  : 한 줄 역할 설명 (신흥파/갱단/경찰 등)
+   full  : 정식 명칭 (없으면 "" 로 비워두면 됨)
+   count : 총 인원 수 — CHARACTERS에 아직 등록 안 된 만큼 "빈 자리" 카드가 자동 표시됩니다.
+   link  : 조직 소개 외부 링크 (없으면 "" 로 비워두면 됩니다)
+============================================================ */
+const ORGANIZATIONS = [
+  {
+    id: "nuovacarta",
+    name: "NUOVA CARTA",
+    role: "신흥파",
+    full: "",
+    count: 4,
+    link: "https://share.crack.wrtn.ai/mpnhkz"
+  },
+  {
+    id: "lamuta",
+    name: "La Muta",
+    role: "갱단",
+    full: "",
+    count: 9,
+    link: "https://share.crack.wrtn.ai/yx7d41"
+  },
+  {
+    id: "dia",
+    name: "DIA",
+    role: "경찰",
+    full: "Direzione Investigativa Antimafia",
+    count: 10,
+    link: ""
+  }
+];
+
+/* ============================================================
+   ⭐ 캐릭터 데이터 — 여기만 수정하면 카드가 자동으로 만들어집니다.
+   ------------------------------------------------------------
+   id       : 고유값 (영문/숫자, 공백없이, 절대 겹치면 안 됨)
+   org      : 소속 조직 id (nuovacarta / lamuta / dia)
+   name     : 캐릭터 이름 (한글, 크게 표시됨)
+   nameOrig : 원어 이름 (예: "Dario Ferrara") — 작게 이름 아래 표시됨. 없으면 "" 로 비워두면 안 뜸
+   image    : 사진 파일 경로. 예) "images/dario.jpg"
+              비워두면("") 이니셜 플레이스홀더로 표시됩니다.
+   gradient : 사진이 없을 때 카드에 쓰이는 배경 그라데이션 (아무거나 참고해서 복사해도 OK)
+   ------------------------------------------------------------
+   ※ 각 조직의 인원(count)보다 등록된 캐릭터 수가 적으면
+      남은 자리는 "빈 자리" 카드로 자동 표시됩니다.
+============================================================ */
+const CHARACTERS = [
+   {
+  id: "moro",
+  org: "nuovacarta",
+  name: "체시아레 모로",
+  nameOrig: "Cesiare Moro",
+  image: "moro.png",
+  gradient: "linear-gradient(160deg, #1f2a1f, #3d5a3d)"
+},
+  {
+  id: "rio",
+  org: "nuovacarta",
+  name: "리오 그리말디",
+  nameOrig: "Rio Grimaldi",
+  image: "rio.png",
+  gradient: "linear-gradient(160deg, #1f2a1f, #3d5a3d)"
+},
+  {
+  id: "gatti",
+  org: "nuovacarta",
+  name: "안드레아스 가티",
+  nameOrig: "Andreas Gatti",
+  image: "gatti.png",
+  gradient: "linear-gradient(160deg, #1f2a1f, #3d5a3d)"
+},
+  {
+  id: "bard",
+  org: "nuovacarta",
+  name: "파비아노 바르디",
+  nameOrig: "Fabiano Bardi",
+  image: "bard.png",
+  gradient: "linear-gradient(160deg, #1f2a1f, #3d5a3d)"
+},
+  {
+    id: "berga",
+    org: "lamuta",
+    name: "베르가",
+    nameOrig: "BERGA",
+    image: "berga.png",
+    gradient: "linear-gradient(160deg, #1a222b, #24425c)"
+  },
+   {
+    id: "bra",
+    org: "lamuta",
+    name: "브라코",
+    nameOrig: "BRACCO",
+    image: "bra.png",
+    gradient: "linear-gradient(160deg, #1a222b, #24425c)"
+  },
+     {
+    id: "gray",
+    org: "lamuta",
+    name: "그레이",
+    nameOrig: "GREY",
+    image: "grey.png",
+    gradient: "linear-gradient(160deg, #1a222b, #24425c)"
+  },
+     {
+    id: "marem",
+    org: "lamuta",
+    name: "마렘마",
+    nameOrig: "MAREMMA",
+    image: "marem.png",
+    gradient: "linear-gradient(160deg, #1a222b, #24425c)"
+  },
+     {
+    id: "burn",
+    org: "lamuta",
+    name: "버나드",
+    nameOrig: "BERNARD",
+    image: "burn.png",
+    gradient: "linear-gradient(160deg, #1a222b, #24425c)"
+  },
+     {
+    id: "cane",
+    org: "lamuta",
+    name: "카네",
+    nameOrig: "CANE",
+    image: "cane.png",
+    gradient: "linear-gradient(160deg, #1a222b, #24425c)"
+  },
+     {
+    id: "del",
+    org: "lamuta",
+    name: "델에트나",
+    nameOrig: "DELL'ETNA",
+    image: "del.png",
+    gradient: "linear-gradient(160deg, #1a222b, #24425c)"
+  },
+     {
+    id: "mast",
+    org: "lamuta",
+    name: "마스티프",
+    nameOrig: "MASTIFF",
+    image: "mast.png",
+    gradient: "linear-gradient(160deg, #1a222b, #24425c)"
+  },
+     {
+    id: "vol",
+    org: "lamuta",
+    name: "볼피노",
+    nameOrig: "VOLPINO",
+    image: "vol.png",
+    gradient: "linear-gradient(160deg, #1a222b, #24425c)"
+  },
+     {
+    id: "bruno",
+    org: "dia",
+    name: "브루노 마르티니",
+    nameOrig: "Bruno Martini",
+    image: "bruno.png",
+    gradient: "linear-gradient(160deg, #1a222b, #24425c)"
+  },
+     {
+    id: "nicolo",
+    org: "dia",
+    name: "니콜로 페라로",
+    nameOrig: "Nicolo Ferraro",
+    image: "nicolo.png",
+    gradient: "linear-gradient(160deg, #1a222b, #24425c)"
+  },
+     {
+    id: "ricci",
+    org: "dia",
+    name: "알렉산드로 리치",
+    nameOrig: "Alessandro Ricci",
+    image: "ricci.png",
+    gradient: "linear-gradient(160deg, #1a222b, #24425c)"
+  },
+    {
+    id: "elia",
+    org: "dia",
+    name: "엘리아 콘티",
+    nameOrig: "Elia Conti",
+    image: "elia.png",
+    gradient: "linear-gradient(160deg, #1a222b, #24425c)"
+  },
+    {
+    id: "greco",
+    org: "dia",
+    name: "다미아노 그레코",
+    nameOrig: "Damiano greco",
+    image: "greco.png",
+    gradient: "linear-gradient(160deg, #1a222b, #24425c)"
+  },
+       {
+    id: "romano",
+    org: "dia",
+    name: "사무엘레 로마노",
+    nameOrig: "Samuele Romano",
+    image: "romano.png",
+    gradient: "linear-gradient(160deg, #1a222b, #24425c)"
+  },
+       {
+    id: "tom",
+    org: "dia",
+    name: "토마소 비안키",
+    nameOrig: "Tommaso Bianchi",
+    image: "tom.png",
+    gradient: "linear-gradient(160deg, #1a222b, #24425c)"
+  },
+    {
+    id: "gab",
+    org: "dia",
+    name: "가브리엘레 모레티",
+    nameOrig: "Gabriele Moretti",
+    image: "gab.png",
+    gradient: "linear-gradient(160deg, #1a222b, #24425c)"
+  },
+       {
+    id: "reone",
+    org: "dia",
+    name: "레오네 비탈레",
+    nameOrig: "Leone Vitale",
+    image: "reone.png",
+    gradient: "linear-gradient(160deg, #1a222b, #24425c)"
+  },
+       {
+    id: "serra",
+    org: "dia",
+    name: "마테오 세라",
+    nameOrig: "Matteo Serra",
+    image: "serra.png",
+    gradient: "linear-gradient(160deg, #1a222b, #24425c)"
+  },
+];
+
+/* ============================================================
+   아래는 자동 렌더링 로직입니다. 특별한 이유가 없다면 수정하지 않아도 됩니다.
+============================================================ */
+
+const orgContainer = document.getElementById('orgContainer');
+const overlay = document.getElementById('overlay');
+
+function cardArtStyle(c){
+  return c.image
+    ? `background-image:url('${c.image}');`
+    : `background:${c.gradient};`;
+}
+
+function cardHTML(c){
+  return `
+    <button class="card" data-id="${c.id}">
+      <div class="card-art" style="${cardArtStyle(c)}">
+        ${c.image ? '' : c.name.charAt(0)}
+      </div>
+      <div class="card-name-bar">
+        <p class="card-name">${c.name}</p>
+        ${c.nameOrig ? `<p class="card-name-orig">${c.nameOrig}</p>` : ''}
+      </div>
+    </button>
+  `;
+}
+
+function placeholderHTML(slotNum){
+  return `
+    <div class="card placeholder">
+      <span class="plus">+</span>
+      <span class="slot-label">미등록 조직원 ${slotNum}</span>
+    </div>
+  `;
+}
+
+function renderOrgSection(org){
+  const members = CHARACTERS.filter(c => c.org === org.id);
+  const remaining = Math.max(org.count - members.length, 0);
+
+  const memberCards = members.map(cardHTML).join('');
+  const placeholderCards = Array.from({ length: remaining })
+    .map((_, i) => placeholderHTML(members.length + i + 1))
+    .join('');
+
+  const titleHTML = org.link
+    ? `<a href="${org.link}" target="_blank" rel="noopener noreferrer">${org.name}</a>`
+    : org.name;
+
+  return `
+    <section class="org-section">
+      <div class="org-header">
+        <h2>${titleHTML}</h2>
+        <p class="org-role">${org.role}${org.full ? ' · ' + org.full : ''}</p>
+        <span class="org-count">${members.length} / ${org.count}</span>
+      </div>
+      <div class="gallery">${memberCards}${placeholderCards}</div>
+    </section>
+  `;
+}
+
+function renderAll(){
+  orgContainer.innerHTML = ORGANIZATIONS.map(renderOrgSection).join('');
+
+  orgContainer.querySelectorAll('.card:not(.placeholder)').forEach(card => {
+    card.addEventListener('click', () => openModal(card.dataset.id));
+  });
+}
+
+function openModal(id){
+  const c = CHARACTERS.find(x => x.id === id);
+  if(!c) return;
+
+  const img = document.getElementById('modalImg');
+  const initial = document.getElementById('modalInitial');
+
+  if(c.image){
+    img.src = c.image;
+    img.style.display = 'block';
+    initial.style.display = 'none';
+  } else {
+    img.style.display = 'none';
+    initial.textContent = c.name.charAt(0);
+    initial.style.display = 'flex';
+    initial.style.background = c.gradient;
+  }
+
+  document.getElementById('modalName').textContent = c.name;
+  document.getElementById('modalNameOrig').textContent = c.nameOrig || '';
+
+  overlay.classList.add('open');
+  document.getElementById('modalClose').focus();
+}
+
+function closeModal(){
+  overlay.classList.remove('open');
+}
+
+document.getElementById('modalClose').addEventListener('click', closeModal);
+overlay.addEventListener('click', (e) => { if(e.target === overlay) closeModal(); });
+document.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeModal(); });
+
+renderAll();
+</script>
+
+</body>
+</html>
